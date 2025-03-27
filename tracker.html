@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Intake Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bottle {
+            width: 120px;
+            height: 300px;
+            border: 3px solid #3498db;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            background: #e0f7ff;
+        }
+        .water {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: #3498db;
+            transition: height 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen bg-blue-50 p-4">
+    <h1 class="text-2xl font-bold mb-4">Daily Water Intake</h1>
+    <div class="bottle relative">
+        <div id="water-level" class="water" style="height: 0%;"></div>
+    </div>
+    <div id="buttons" class="mt-4 space-x-2">
+        <button class="px-4 py-2 bg-blue-500 text-white rounded" onclick="addWater(250)">250ml</button>
+        <button class="px-4 py-2 bg-blue-600 text-white rounded" onclick="addWater(500)">500ml</button>
+        <button class="px-4 py-2 bg-blue-700 text-white rounded" onclick="addWater(750)">750ml</button>
+    </div>
+    <div id="timer" class="hidden mt-4 text-lg font-semibold text-red-500"></div>
+    <script>
+        let totalWater = 0;
+        const maxWater = 3000;
+        const waterLevel = document.getElementById("water-level");
+        const buttons = document.getElementById("buttons");
+        const timerDisplay = document.getElementById("timer");
+
+        function addWater(amount) {
+            if (totalWater + amount <= maxWater) {
+                totalWater += amount;
+                let percentage = (totalWater / maxWater) * 100;
+                waterLevel.style.height = percentage + "%";
+                startCooldown();
+            }
+            if (totalWater >= maxWater) {
+                setTimeout(() => alert("You are fully hydrated! 😊👍🥤"), 500);
+            }
+        }
+
+        function startCooldown() {
+            buttons.classList.add("hidden");
+            let timeLeft = 10;
+            timerDisplay.classList.remove("hidden");
+            const interval = setInterval(() => {
+                timerDisplay.innerText = `Next intake in ${timeLeft}s`;
+                timeLeft--;
+                if (timeLeft < 0) {
+                    clearInterval(interval);
+                    timerDisplay.classList.add("hidden");
+                    buttons.classList.remove("hidden");
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
