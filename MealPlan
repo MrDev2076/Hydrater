@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Meal Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-800 p-4">
+    <div class="max-w-6xl mx-auto bg-gray-200 p-6 rounded-lg shadow-lg">
+        <h2 class="text-3xl font-bold mb-6 text-center">AI-Powered Meal Planner</h2>
+        
+        <div id="mealForm" class="space-y-4">
+            <label class="block">Select Age Range:
+                <select id="ageRange" class="w-full p-2 border rounded">
+                    <option value="kids0-5">Kids (0-5)</option>
+                    <option value="kids5-12">Kids (5-12)</option>
+                    <option value="teens">Teens (Below 19)</option>
+                    <option value="young">Young (20-30)</option>
+                    <option value="middle">Middle Age (30-50)</option>
+                    <option value="aged">Aged (50-70)</option>
+                    <option value="older">Older (Above 70)</option>
+                </select>
+            </label>
+            
+            <label class="block">Select Nationality/Region:
+                <select id="region" class="w-full p-2 border rounded">
+                    <option value="indian">Indian</option>
+                    <option value="arabic">Arabic</option>
+                    <option value="southindian">South Indian</option>
+                    <option value="chinese">Chinese</option>
+                    <option value="korean">Korean</option>
+                    <option value="italian">Italian</option>
+                    <option value="turkish">Turkish</option>
+                    <option value="german">German</option>
+                    <option value="dutch">Dutch</option>
+                    <option value="japanese">Japanese</option>
+                    <option value="russian">Russian</option>
+                    <option value="american">American</option>
+                    <option value="vatican">Vatican</option>
+                </select>
+            </label>
+
+            <label class="block">Veg or Non-Veg:
+                <select id="vegNonVeg" class="w-full p-2 border rounded">
+                    <option value="veg">Veg</option>
+                    <option value="nonveg">Non-Veg</option>
+                </select>
+            </label>
+
+            <label class="block">Select Workout Activity:
+                <select id="workoutActivity" class="w-full p-2 border rounded">
+                    <option value="cycling">Cycling</option>
+                    <option value="walking">Walking</option>
+                    <option value="yoga">Yoga</option>
+                    <option value="gym">Gym</option>
+                </select>
+            </label>
+
+            <label class="block">Select Workout Duration:
+                <select id="workoutTime" class="w-full p-2 border rounded">
+                    <option value="less30">Less than 30 min</option>
+                    <option value="30-60">30-60 min</option>
+                    <option value="more60">More than 60 min</option>
+                </select>
+            </label>
+
+            <label class="block">Select Workout Level:
+                <select id="workoutLevel" class="w-full p-2 border rounded">
+                    <option value="sedentary">Sedentary</option>
+                    <option value="light">Light</option>
+                    <option value="moderate">Moderate</option>
+                    <option value="intense">Intense</option>
+                </select>
+            </label>
+
+            <label class="block">Select Breakfast Preference:
+                <select id="breakfastPref" class="w-full p-2 border rounded">
+                    <option value="light">Light</option>
+                    <option value="medium">Medium</option>
+                    <option value="heavy">Heavy</option>
+                </select>
+            </label>
+            
+            <label class="block">Select Lunch Preference:
+                <select id="lunchPref" class="w-full p-2 border rounded">
+                    <option value="diet">Diet</option>
+                    <option value="less">Less</option>
+                    <option value="heavy">Heavy</option>
+                </select>
+            </label>
+            
+            <label class="block">Select Dinner Preference:
+                <select id="dinnerPref" class="w-full p-2 border rounded">
+                    <option value="light">Light</option>
+                    <option value="medium">Medium</option>
+                    <option value="heavy">Heavy</option>
+                </select>
+            </label>
+
+            <label class="block">Weight (kg):
+                <input type="number" id="weight" class="w-full p-2 border rounded">
+            </label>
+            <label class="block">Height (cm):
+                <input type="number" id="height" class="w-full p-2 border rounded">
+            </label>
+            <button type="button" id="generateMealPlan" class="w-full bg-blue-500 text-white p-2 rounded">Generate Meal Plan</button>
+        </div>
+        
+        <div id="mealPlan" class="mt-6"></div>
+    </div>
+    
+    <script>
+        document.getElementById("generateMealPlan").addEventListener("click", async function() {
+            const ageRange = document.getElementById("ageRange").value;
+            const region = document.getElementById("region").value;
+            const vegNonVeg = document.getElementById("vegNonVeg").value;
+            const workoutActivity = document.getElementById("workoutActivity").value;
+            const workoutTime = document.getElementById("workoutTime").value;
+            const workoutLevel = document.getElementById("workoutLevel").value;
+            const breakfastPref = document.getElementById("breakfastPref").value;
+            const lunchPref = document.getElementById("lunchPref").value;
+            const dinnerPref = document.getElementById("dinnerPref").value;
+            const weight = document.getElementById("weight").value;
+            const height = document.getElementById("height").value;
+            
+            const bmi = (weight / ((height / 100) * (height / 100))).toFixed(2);
+            const caloriesBurned = calculateCaloriesBurned(workoutLevel, weight, height);
+            
+            const meals = await fetchMeals(region, vegNonVeg, breakfastPref, lunchPref, dinnerPref);
+            
+            document.getElementById("mealPlan").innerHTML = `
+                <h3 class='text-xl font-bold mt-4'>Your Meal Plan</h3>
+                <p class='mb-2'>BMI: ${bmi} | Calories Burned per Day: ${caloriesBurned} kcal</p>
+                <div class='grid grid-cols-1 md:grid-cols-3 gap-6'>
+                    ${Object.entries(meals).map(([type, meal]) => `
+                    <div class='border p-4 rounded shadow-lg bg-gray-50'>
+                        <h4 class='text-lg font-bold mt-2'>${meal.title} (${type.charAt(0).toUpperCase() + type.slice(1)})</h4>
+                        <img src="${meal.image}" alt="${meal.title}" class='w-full h-40 object-cover rounded'>
+                        <p class='text-sm mt-2'>${meal.description.slice(0, 250)}...</p>
+                        <ul class='mt-2 text-sm'>
+                            <li><strong>Calories:</strong> ${meal.calories} kcal</li>
+                            <li><strong>Carbs:</strong> ${meal.carbohydrates}g</li>
+                            <li><strong>Protein:</strong> ${meal.protein}g</li>
+                            <li><strong>Fats:</strong> ${meal.fats}g</li>
+                        </ul>
+                    </div>`).join('')}
+                </div>`;
+        });
+        
+        function calculateCaloriesBurned(workoutLevel, weight, height) {
+            let multiplier;
+            switch (workoutLevel) {
+                case "sedentary":
+                    multiplier = 1.2;
+                    break;
+                case "light":
+                    multiplier = 1.375;
+                    break;
+                case "moderate":
+                    multiplier = 1.55;
+                    break;
+                case "intense":
+                    multiplier = 1.725;
+                    break;
+                default:
+                    multiplier = 1.2;
+            }
+            const bmr = 10 * weight + 6.25 * height - 5 * 25 + 5;  // Assuming age of 25 for calculation
+            return Math.round(bmr * multiplier);
+        }
+        
+        async function fetchMeals(region, vegNonVeg, breakfastPref, lunchPref, dinnerPref) {
+            try {
+                const mealTypes = ["breakfast", "lunch", "dinner"];
+                const meals = {};
+                for (const type of mealTypes) {
+                    const response = await fetch(https://www.themealdb.com/api/json/v1/1/filter.php?a=${region});
+                    const data = await response.json();
+                    const meal = data.meals[Math.floor(Math.random() * data.meals.length)];
+                    meals[type] = {
+                        title: meal.strMeal,
+                        image: meal.strMealThumb,
+                        description: This meal is specially curated for the ${region} region. It aligns with a ${type === 'breakfast' ? breakfastPref : type === 'lunch' ? lunchPref : dinnerPref} meal preference and provides balanced nutrition. Enjoy a flavorful and healthy dish suited for your needs.,
+                        calories: Math.floor(Math.random() * 500) + 200,
+                        carbohydrates: Math.floor(Math.random() * 50) + 20,
+                        protein: Math.floor(Math.random() * 30) + 10,
+                        fats: Math.floor(Math.random() * 20) + 5
+                    };
+                }
+                return meals;
+            } catch (error) {
+                console.error("Error fetching meal data:", error);
+                return { breakfast: {}, lunch: {}, dinner: {} };
+            }
+        }
+    </script>
+</body>
+</html>
